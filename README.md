@@ -1,7 +1,6 @@
-# baa-rnd-pancreas-tumor-segmentation
 # Pancreatic Tumor Detection using MONAI
 
-This project aims to detect pancreatic tumors using the MONAI library, which provides deep learning tools for medical imaging. The code in this repository utilizes deep learning models and image processing techniques to automatically identify and localize pancreatic tumors in medical images.
+This project aims to detect and segment pancreatic tumors using the MONAI (Medical Open Network for AI) library, which provides deep learning tools for medical imaging. The code in this repository utilizes deep learning models and image processing techniques to automatically identify and localize pancreatic tumors in medical images.
 
 ## Table of Contents
 
@@ -31,6 +30,10 @@ To set up the project, follow these steps:
   ```shell
    docker run --name {name of the container} --gpus all -it --privileged -v /Downloads:/home --ipc=host { name of the image ex- monai/nvidia/cuda:11.8.0-ubuntu20.04}
   ```
+
+  Replace <container_name> with a name for the container, <image_name> with the name of the Docker image (e.g., monai/nvidia/cuda), and /Downloads with the path to the local directory containing the code and data.
+
+
 4. Clone the repository:
 
   ```shell
@@ -46,7 +49,38 @@ This will install the required libraries, including MONAI, necessary for running
 
 
 The data is saved
-home/Task07_Pancreas
-├── imagesTr/
-├── imagesTs/
-└── labelsTr/
+home/Task07_Pancreas/
+    |-- imagesTr/
+    |-- imagesTs/
+    |-- labelsTr/
+
+## Model Training and Evaluation
+
+The code provided in the repository includes the following components:
+
+### Data Loading and Transformation
+
+- The data loading and transformation steps are defined in the `get_transforms()` function and are applied to both training and validation datasets.
+- Various MONAI transforms are used to preprocess the data, including rescaling intensity values, cropping, normalizing intensity, and augmenting the data with random shifts, scaling, and Gaussian noise.
+
+### Model Architecture
+
+- The model architecture used in this project is a SegResNet, which is a U-Net-like architecture with residual blocks.
+- The model is defined in the `segresnet()` function and takes the number of input and output channels as arguments.
+
+### Loss Function, Optimizer, and Scheduler
+
+- The loss function used for training is a combination of Dice loss and Cross-Entropy loss (DiceCELoss).
+- The optimizer is Adam with a learning rate of 1e-4 and weight decay of 1e-5.
+- A CosineAnnealingLR scheduler is used to adjust the learning rate during training.
+
+### Metrics and Post-Transformations
+
+- The Dice metric is used to evaluate the model's performance during validation.
+- The `post_trans` function applies sigmoid activation and converts the predicted probabilities to discrete labels.
+
+### Training Loop
+
+- The `training_loop()` function implements the main training and validation loop.
+- The training loop iterates over the specified number of epochs, performs forward and backward passes, and updates the model's parameters.
+- Validation is performed at specified intervals, and the best model based on the Dice metric is saved.
